@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
-// import { useSelector, useDispatch } from "react-redux";
-import { addItem } from './CartItem'
+import { useSelector, useDispatch } from "react-redux";
+import { addItem } from './CartSlice';
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
@@ -234,6 +234,13 @@ function ProductList({ onHomeClick }) {
         fontSize: '30px',
         textDecoration: 'none',
     }
+    const styleB = {
+        display: 'flex',
+        alignIems: 'center',
+        justifyContent: 'space-between',
+        gap: '-10px',
+    }
+    const dispatch = useDispatch();
     const handleAddToCart = (product) => {
         dispatch(addItem(product)); // Dispatch the action to add the product to the cart (Redux action)
         setAddedToCart((prevState) => ({ // Update the local state to reflect that the product has been added
@@ -244,6 +251,11 @@ function ProductList({ onHomeClick }) {
     const handleHomeClick = (e) => {
         e.preventDefault();
         onHomeClick();
+        if (showCart) {
+            setShowCart(false);
+        } else if (!showPlants) {
+            setShowPlants(true);
+        }
     };
 
     const handleCartClick = (e) => {
@@ -260,8 +272,9 @@ function ProductList({ onHomeClick }) {
         e.preventDefault();
         setShowCart(false);
     };
+    const CartItems = useSelector(state => state.cart.items);
     const calculateTotalQuantity = () => {
-        return CartItem.items ? CartItem.items.reduce((total, item) => total + item.quantity, 0) : 0;
+        return CartItems ? CartItems.reduce((total, item) => total + item.quantity, 0) : 0;
     };
     return (
         <div>
@@ -280,7 +293,10 @@ function ProductList({ onHomeClick }) {
                 </div>
                 <div style={styleObjUl}>
                     <div> <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>Plants</a></div>
-                    <div> <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}><h1 className='cart'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68"><rect width="156" height="156" fill="none"></rect><circle cx="80" cy="216" r="12"></circle><circle cx="184" cy="216" r="12"></circle><path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" id="mainIconPathAttribute"></path></svg></h1></a></div>
+                    <div style={styleB}>
+                        <div>{calculateTotalQuantity()}</div>
+                        <div> <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}><h1 className='cart'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68"><rect width="156" height="156" fill="none"></rect><circle cx="80" cy="216" r="12"></circle><circle cx="184" cy="216" r="12"></circle><path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" id="mainIconPathAttribute"></path></svg></h1></a></div>
+                    </div>
                 </div>
             </div>
             {!showCart ? (
@@ -295,11 +311,11 @@ function ProductList({ onHomeClick }) {
                             <div className="product-title">{plant.name}</div> {/* Display plant name */}
                             {/* Display other plant details like description and cost */}
                             <div className="product-description">{plant.description}</div> {/* Display plant description */}
-                            <div className="product-cost">${plant.cost}</div> {/* Display plant cost in USD */}
-                            <button className="product-button"
-                                onClick={() => handleAddToCart(plant)} // Handle adding plant to cart
+                            <div className="product-cost">{plant.cost}</div> {/* Display plant cost in USD */}
+                            <button className={`product-button${addedToCart[plant.name] ? '.added-to-cart':''}`}
+                                onClick={addedToCart[plant.name] ? {}:() => handleAddToCart(plant)} // Handle adding plant to cart
                             >
-                                Add to Cart
+                                {addedToCart[plant.name]? 'Added to Cart': 'Add to Cart'}
                             </button>
                         </div>
                         ))}
@@ -308,7 +324,7 @@ function ProductList({ onHomeClick }) {
                 ))}
             </div>
             ) : (
-                <CartItem onContinueShopping={handleContinueShopping} />
+                <CartItem onContinueShopping={handleContinueShopping} setAddedToCart={setAddedToCart} />
             )}
         </div>
     );
