@@ -7,18 +7,18 @@ function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
     const [addedToCart, setAddedToCart] = useState({});
-    /*const [plantsArray, setPlantsArray] = useState([]);
+    const [plantsArray, setPlantsArray] = useState([]);
     // download data using side effect
     useEffect(() => {
         fetch("./products.json")
           .then((response) => response.json())
-          .then((data) => setPlantsArray(data))
+          .then((data) => setPlantsArray(data.plantsArray))
           .catch((e) => {
             console.error("Error downloading products data");
             console.error(`Error thrown: ${e}`);
           });
-      }, []);*/
-      const plantsArray = [
+      }, []);
+      /*const plantsArray = [
         {
             category: "Air Purifying Plants",
             plants: [
@@ -224,7 +224,7 @@ function ProductList({ onHomeClick }) {
                 }
             ]
         }
-    ];
+    ];*/
   
     const styleObj = {
         backgroundColor: '#4CAF50',
